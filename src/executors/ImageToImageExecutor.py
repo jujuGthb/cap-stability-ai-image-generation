@@ -62,13 +62,12 @@ class ImageToImageExecutor(Component):
             raise RuntimeError("Failed to encode image")
 
         image_bytes = encoded_image.tobytes()
-
-        model = self.model if self.model in ENDPOINTS else "core"
-        url = f"{API_HOST}{ENDPOINTS[model]}"
-
         payload = self._build_payload()
 
         try:
+            model = self.model if self.model in ENDPOINTS else "core"
+            url = f"{API_HOST}{ENDPOINTS[model]}"
+
             response = requests.post(
                 url,
                 headers={
@@ -80,19 +79,21 @@ class ImageToImageExecutor(Component):
             )
 
             print(f"[DEBUG] Status: {response.status_code}")
-
             response.raise_for_status()
 
             image_array = np.frombuffer(response.content, dtype=np.uint8)
-            self.output_image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+            numpy_image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+
+            img.value = numpy_image  # ← replace with Stability AI output
+            self.image = Image.set_frame(img=img, package_uID=self.uID, redis_db=self.redis_db)
 
         except requests.exceptions.HTTPError as e:
             print(f"[ERROR] HTTP Error {response.status_code}: {response.text}")
-            self.output_image = None
+            self.image = None
         except Exception as e:
             import traceback
             print(traceback.format_exc())
-            self.output_image = None
+            self.image = None
 
         return build_response_image_to_image(context=self)
 

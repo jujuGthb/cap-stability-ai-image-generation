@@ -1,5 +1,4 @@
 from sdks.novavision.src.helper.package import PackageHelper
-from sdks.novavision.src.media.image import Image
 from components.StabilityAI.src.models.PackageModel import (
     PackageModel,
     PackageConfigs,

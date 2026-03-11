@@ -81,7 +81,7 @@ class TextToImageExecutor(Component):
                 encoding="bytes",
                 value=numpy_image,
                 r_key="",
-                shape_key=np.array(numpy_image.shape, dtype=np.int64)
+                shape_key=np.array(numpy_image.shape, dtype=np.int64),
                 type="object"
             )
             self.image = Image.set_frame(img=img, package_uID=self.uID, redis_db=self.redis_db)

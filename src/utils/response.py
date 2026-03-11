@@ -14,7 +14,7 @@ from components.StabilityAI.src.models.PackageModel import (
 
 
 def build_response_text_to_image(context):
-    output = OutputImage(value=Image.context.image)
+    output = OutputImage(value=context.image)
     outputs = TextToImageOutputs(outputImage=output)
     response = TextToImageResponse(outputs=outputs)
     executor = TextToImageExecutor(value=response)
@@ -26,7 +26,7 @@ def build_response_text_to_image(context):
 
 
 def build_response_image_to_image(context):
-    output = OutputImage(value=Image.context.image)
+    output = OutputImage(value=context.image)
     outputs = ImageToImageOutputs(outputImage=output)
     response = ImageToImageResponse(outputs=outputs)
     executor = ImageToImageExecutor(value=response)

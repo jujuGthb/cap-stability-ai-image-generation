@@ -27,7 +27,7 @@ def build_response_text_to_image(context):
 
 
 def build_response_image_to_image(context):
-    output = OutputImage(value=Image.from_numpy(context.output_image))
+    output = OutputImage(value=Image.context.image)
     outputs = ImageToImageOutputs(outputImage=output)
     response = ImageToImageResponse(outputs=outputs)
     executor = ImageToImageExecutor(value=response)

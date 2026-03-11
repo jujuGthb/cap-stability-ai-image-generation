@@ -84,7 +84,7 @@ class ImageToImageExecutor(Component):
             image_array = np.frombuffer(response.content, dtype=np.uint8)
             numpy_image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
-            img.value = numpy_image  # ← replace with Stability AI output
+            img.value = numpy_image
             self.image = Image.set_frame(img=img, package_uID=self.uID, redis_db=self.redis_db)
 
         except requests.exceptions.HTTPError as e:

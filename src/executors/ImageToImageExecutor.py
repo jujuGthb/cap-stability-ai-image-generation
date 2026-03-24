@@ -56,6 +56,9 @@ class ImageToImageExecutor(Component):
 
     def run(self):
         img = Image.get_frame(img=self.image_selector, redis_db=self.redis_db)
+        print(f"[DEBUG] img from get_frame: {img}")  
+        print(f"[DEBUG] img.value shape: {img.value.shape if img is not None else 'None'}")
+
 
         success, encoded_image = cv2.imencode('.jpg', img.value)
         if not success:

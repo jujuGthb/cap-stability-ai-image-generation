@@ -5,15 +5,16 @@ Stability AI Image Generation Executor: Generates a new image from a text prompt
 import os
 import sys
 import cv2
+import uuid
 import numpy as np
 import requests
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../'))
 
-from sdks.novavision.src.media.image import Image
+from sdks.novavision.src.base.model import Image
+from sdks.novavision.src.media.image import Image as image
 from sdks.novavision.src.base.component import Component
 from sdks.novavision.src.helper.executor import Executor
-from sdks.novavision.src.base.model import Image as ImageModel
 from components.StabilityAI.src.utils.response import build_response_text_to_image
 from components.StabilityAI.src.models.PackageModel import PackageModel
 
@@ -74,18 +75,10 @@ class TextToImageExecutor(Component):
             image_array = np.frombuffer(response.content, dtype=np.uint8)
             numpy_image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
-            img = ImageModel(
-                name="outputImage",
-                uID=self.uID,
-                mimeType="image/jpg",
-                encoding="bytes",
-                value=numpy_image,
-                r_key="",
-                shape_key=np.array(numpy_image.shape, dtype=np.int64),
-                type="object"
-            )
-            self.image = Image.set_frame(img=img, package_uID=self.uID, redis_db=self.redis_db)
-
+            uID = str(uuid.uuid4())
+            self.image = Image(name="outputImage_" + uID, uID=uID, mimeType="image/jpg", encoding="bytes", value=numpy_image, r_key='', type="Image")
+            self.image = image.set_frame(img=self.image, package_uID=self.uID, redis_db=self.redis_db)
+            
         except requests.exceptions.HTTPError as e:
             print(f"[ERROR] HTTP Error {response.status_code}: {response.text}")
             self.image = None

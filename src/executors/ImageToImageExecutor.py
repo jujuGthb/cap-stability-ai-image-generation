@@ -35,10 +35,6 @@ class ImageToImageExecutor(Component):
         self.model = self.request.get_param("inputModel")
         self.api_key = self.request.get_param("inputApiKey")
         self.image_selector = self.request.get_param("inputImage")
-        print(f"[DEBUG] api_key received: '{self.api_key}'")
-        print(f"[DEBUG] model: '{self.model}'")
-        print(f"[DEBUG] prompt: '{self.prompt}'")
-        print(f"[DEBUG] strength: '{self.strength}'")
 
     @staticmethod
     def bootstrap(config: dict) -> dict:
@@ -56,10 +52,6 @@ class ImageToImageExecutor(Component):
 
     def run(self):
         img = Image.get_frame(img=self.image_selector, redis_db=self.redis_db)
-        print(f"[DEBUG] img from get_frame: {img}")  
-        print(f"[DEBUG] img.value shape: {img.value.shape if img is not None else 'None'}")
-
-
         success, encoded_image = cv2.imencode('.jpg', img.value)
         if not success:
             raise RuntimeError("Failed to encode image")
@@ -81,7 +73,6 @@ class ImageToImageExecutor(Component):
                 data=payload
             )
 
-            print(f"[DEBUG] Status: {response.status_code}")
             response.raise_for_status()
 
             image_array = np.frombuffer(response.content, dtype=np.uint8)
@@ -91,11 +82,8 @@ class ImageToImageExecutor(Component):
             self.image = Image.set_frame(img=img, package_uID=self.uID, redis_db=self.redis_db)
 
         except requests.exceptions.HTTPError as e:
-            print(f"[ERROR] HTTP Error {response.status_code}: {response.text}")
             self.image = None
         except Exception as e:
-            import traceback
-            print(traceback.format_exc())
             self.image = None
 
         return build_response_image_to_image(context=self)

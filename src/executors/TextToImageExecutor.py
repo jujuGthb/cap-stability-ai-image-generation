@@ -35,9 +35,6 @@ class TextToImageExecutor(Component):
         self.negative_prompt = self.request.get_param("negativePrompt")
         self.model = self.request.get_param("inputModel")
         self.api_key = self.request.get_param("inputApiKey")
-        print(f"[DEBUG] api_key received: '{self.api_key}'")
-        print(f"[DEBUG] model: '{self.model}'")
-        print(f"[DEBUG] prompt: '{self.prompt}'")
 
     @staticmethod
     def bootstrap(config: dict) -> dict:
@@ -69,7 +66,6 @@ class TextToImageExecutor(Component):
                 data=payload
             )
 
-            print(f"[DEBUG] Status: {response.status_code}")
             response.raise_for_status()
 
             image_array = np.frombuffer(response.content, dtype=np.uint8)
@@ -80,11 +76,8 @@ class TextToImageExecutor(Component):
             self.image = image.set_frame(img=self.image, package_uID=self.uID, redis_db=self.redis_db)
             
         except requests.exceptions.HTTPError as e:
-            print(f"[ERROR] HTTP Error {response.status_code}: {response.text}")
             self.image = None
         except Exception as e:
-            import traceback
-            print(traceback.format_exc())
             self.image = None
 
         return build_response_text_to_image(context=self)
